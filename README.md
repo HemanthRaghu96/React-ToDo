@@ -3,7 +3,7 @@ I create a Todo App which have All CRUD Functionalities without API.\
 I create Todo with name, Description & status. \
 There are two buttons in the name of edit and Delete which used to perform update and delete created todos \
 By onclick on status it should show a dropdown for completed and not completed by that we can change the status of todo.\
-All todos are displayed in Card. \
+All todos are displayed in Card. 
 
 Demo Live App:https://react-todo-h.netlify.app/
 
