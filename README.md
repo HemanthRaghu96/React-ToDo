@@ -1,6 +1,14 @@
 # React Todo
+I create a Todo App which have All CRUD Functionalities without API.\
+I create Todo with name, Description & status. \
+There are two buttons in the name of edit and Delete which used to perform update and delete created todos \
+By onclick on status it should show a dropdown for completed and not completed by that we can change the status of todo.\
+All todos are displayed in Card. \
 
-Demo Live Link : https://65c2287ddb50cd0088d1014c--resplendent-pothos-edaf61.netlify.app/
+Demo Live App:https://react-todo-h.netlify.app/
+
+This project is open scorce,
+🚀 Give a Star ⭐️ & Fork to this project ... Happy coding! 🤩
 
 # Getting Started with Create React App
 
