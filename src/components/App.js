@@ -1,118 +1,117 @@
-// Importing useState hook from React
-import { useState } from "react";
-// Importing components
+import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import Card from "./Card";
-import Add from "./Add";
-import Edit from "./Edit";
-import StatusFilterDropDown from "./StatusFilterDropDown";
+import Filter from "./Filter";
+import Header from "./Header";
 
-// Define the main App component
-function App() { 
-  // Initial data
-  const datas = [{ id: 1, name: "HTML", description: "Learn HTML Today",status:'Not Complete' }];
+function App() {
+  const [data, setData] = useState(() => {
+    const savedData = localStorage.getItem("todos");
+    return savedData ? JSON.parse(savedData) : [];
+  });
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [editTodo, setEditTodo] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
-  // State variables using useState hook
-  const [userdata, setuserdata] = useState(datas);
-  const initialformstate = { id: 1, name: "", description: "",status: "" };
-  const [currentuserdata, setcurrentuserdata] = useState(initialformstate);
-  const [editing, setediting] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [cardStatus, setCardStatus] = useState('Not Complete');
-  
-  // Function to set editing mode and populate form data for editing
-  const editfun = (datas) => {
-    setediting(true);
-    setcurrentuserdata({
-      id: datas.id,
-      name: datas.name,
-      description: datas.description,
-      status: datas.status
-    });
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(data));
+  }, [data]);
+
+  const addDataToCard = () => {
+    if (name.trim() !== "") {
+      const newTodo = {
+        id: uuidv4(),
+        name,
+        description,
+        completed: false,
+      };
+      setData([...data, newTodo]);
+      setName("");
+      setDescription("");
+    }
   };
 
-  // Function to add a new user data
-  const adduser = (dataval) => {
-    dataval.id = userdata.length + 1;
-    setuserdata([...userdata, dataval]);
+  const filteredData = data.filter((todo) => {
+    if (statusFilter === "completed") {
+      return todo.completed;
+    } else if (statusFilter === "notCompleted") {
+      return !todo.completed;
+    } else {
+      return true;
+    }
+  });
+
+  const cardStatus = (id) => {
+    setData(
+      data.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   };
 
-  // Function to update user data
-  const updateUser = (id, updateUser) => {
-    setediting(false);
-    setuserdata(userdata.map((user) => (user.id === id ? updateUser : user)));
+  const filterStatus = (status) => {
+    setStatusFilter(status);
   };
 
-  // Function to delete user data
-  const deletefun = (userId) => {
-    setuserdata(userdata.filter((user) => user.id !== userId));
-    setediting(false);
+  const openEdit = (todo) => {
+    setEditTodo(todo);
+    setEditName(todo.name);
+    setEditDescription(todo.description);
   };
 
-  // Function to handle status filter selection
-  const handleFilterSelect = (filterselect) => {
-    setSelectedStatus(filterselect); 
+  const closeEdit = () => {
+    setEditTodo(null);
   };
 
-  // Function to handle status filter
-  const handleFilter = (filterstatus) => {
-    setCardStatus(filterstatus); 
+  const updateData = () => {
+    setData(
+      data.map((todo) =>
+        todo.id === editTodo.id
+          ? {
+              ...todo,
+              name: editName,
+              description: editDescription,
+            }
+          : todo
+      )
+    );
+    setEditTodo(null);
   };
 
-  // Function to handle status change for a user
-  const handleStatusChange = (userId, newStatus) => {
-    setuserdata(userdata.map((user) => (user.id === userId ? { ...user, status: newStatus } : user)));
+  const deleteData = (id) => {
+    setData(data.filter((todo) => todo.id !== id));
   };
 
-  // Filtering data based on selected status
-  const filteredData = selectedStatus === 'All' ? userdata : userdata.filter(todo => todo.status === selectedStatus);
-
-  // Rendering the JSX
   return (
-    <section>
-      <div className="mt-32 w-9/12 mx-auto ">
-        {/* Conditional rendering of either Edit or Add component based on editing state */}
-        {editing ? (
-          <Edit
-            currentuserdata={currentuserdata}
-            setediting={setediting}
-            updateUser={updateUser}
-          />
-        ) : (
-          <Add adduser={adduser} setuserdata={setuserdata} />
-        )}
-      </div>
+    <main  className="flex flex-col w-full">
+      <Header
+        name={name}
+        description={description}
+        addDataToCard={addDataToCard}
+        setName={setName}
+        setDescription={setDescription}
+      />
 
-      <div className="w-10/12 mx-auto flex justify-between my-7">
-        {/* Header */}
-        <h1 className="text-black  font-medium text-xl mx-10">My todos</h1>
+      <Filter filterStatus={filterStatus} statusFilter={statusFilter} />
 
-        {/* Status filter dropdown */}
-        <div className="flex justify-center">
-          <h1 className="text-black  font-medium text-xl">
-            Status Filter :{" "}
-          </h1>
-          <div className='mx-2'>
-            <StatusFilterDropDown onSelect={handleFilterSelect}/>
-          </div>
-          
-        </div>
-      </div>
-    
-
-      <div className="w-10/12 mx-auto flex mt-5">
-        {/* Card component to display user data */}
-        <Card
-          setediting={setediting}
-          editfun={editfun}
-          deletefun={deletefun}
-          userdata={filteredData} 
-          onSelect={handleFilter}
-          onStatusChange={handleStatusChange}
-        />
-      </div>
-    </section>
+      <Card
+        data={filteredData}
+        editTodo={editTodo}
+        editName={editName}
+        setEditName={setEditName}
+        editDescription={editDescription}
+        setEditDescription={setEditDescription}
+        updateData={updateData}
+        closeEdit={closeEdit}
+        deleteData={deleteData}
+        openEdit={openEdit}
+        cardStatus={cardStatus}
+      />
+    </main>
   );
 }
 
-// Exporting the App component as the default export
 export default App;
