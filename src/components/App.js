@@ -5,6 +5,7 @@ import Filter from "./Filter";
 import Header from "./Header";
 
 function App() {
+  // State declarations
   const [data, setData] = useState(() => {
     const savedData = localStorage.getItem("todos");
     return savedData ? JSON.parse(savedData) : [];
@@ -16,10 +17,12 @@ function App() {
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
+  // Effect to save data to localStorage
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(data));
   }, [data]);
 
+  // Function to add new data to card
   const addDataToCard = () => {
     if (name.trim() !== "") {
       const newTodo = {
@@ -34,6 +37,7 @@ function App() {
     }
   };
 
+  // Filtering the data based on status
   const filteredData = data.filter((todo) => {
     if (statusFilter === "completed") {
       return todo.completed;
@@ -44,6 +48,7 @@ function App() {
     }
   });
 
+  // Function to toggle completion status of a card
   const cardStatus = (id) => {
     setData(
       data.map((todo) =>
@@ -52,20 +57,24 @@ function App() {
     );
   };
 
+  // Function to handle filter status change
   const filterStatus = (status) => {
     setStatusFilter(status);
   };
 
+  // Function to open editing mode for a card
   const openEdit = (todo) => {
     setEditTodo(todo);
     setEditName(todo.name);
     setEditDescription(todo.description);
   };
 
+  // Function to close editing mode
   const closeEdit = () => {
     setEditTodo(null);
   };
 
+  // Function to update edited data
   const updateData = () => {
     setData(
       data.map((todo) =>
@@ -81,12 +90,14 @@ function App() {
     setEditTodo(null);
   };
 
+  // Function to delete data from card
   const deleteData = (id) => {
     setData(data.filter((todo) => todo.id !== id));
   };
 
   return (
     <main  className="flex flex-col w-full">
+      {/* Header component */}
       <Header
         name={name}
         description={description}
@@ -95,8 +106,10 @@ function App() {
         setDescription={setDescription}
       />
 
+      {/* Filter component */}
       <Filter filterStatus={filterStatus} statusFilter={statusFilter} />
 
+      {/* Card component */}
       <Card
         data={filteredData}
         editTodo={editTodo}
